@@ -44,9 +44,21 @@ export default function Navbar() {
             Groups
           </Link>
 
-          <button className="rounded-full bg-linear-to-b from-purple-900 to-purple-500 px-5 py-2.5 font-semibold text-purple-350 transition hover:bg-linear-to-b hover:from-purple-500 hover:to-purple-900 hover:scale-105">
-            Login
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="rounded-full bg-linear-to-b from-purple-900 to-purple-500 px-5 py-2.5 font-semibold text-purple-350 transition hover:bg-linear-to-b hover:from-purple-500 hover:to-purple-900 hover:scale-105"
+            >
+              Login
+            </Link>
+
+            <Link
+              href="/signup"
+              className="rounded-full border border-purple-400  px-5 py-2.5 font-semibold text-purple-350 transition hover:bg-linear-to-b hover:from-purple-500 hover:to-purple-900 hover:scale-105"
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
