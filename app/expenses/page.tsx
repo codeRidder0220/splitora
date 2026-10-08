@@ -3,8 +3,15 @@ import ExpenseForm from "@/components/ExpenseForm";
 import PageHeader from "@/components/PageHeader";
 import { getExpenses } from "@/app/actions/expense-action";
 import DeleteExpenseButton from "@/components/DeleteExpenseButton";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 export default async function ExpensesPage() {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        redirect("/login");
+    }
 
     const expenses = await getExpenses();
 

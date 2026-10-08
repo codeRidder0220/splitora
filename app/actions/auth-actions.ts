@@ -91,3 +91,14 @@ export async function login(
         email: user.email,
     };
 }
+
+//logout -->
+export async function logout() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete("splitora_token");
+
+  return {
+    success: true,
+  };
+}

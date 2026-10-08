@@ -1,12 +1,12 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-  
+import NavbarServer from "@/components/NavbarServer";
+
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>)
  {
   return (
     <html lang="en">
       <body>
-        <Navbar/>
+        <NavbarServer />
         {children}
       </body>
     </html>

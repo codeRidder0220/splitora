@@ -3,10 +3,18 @@ import PageHeader from "@/components/PageHeader";
 import { getGroups } from "@/app/actions/group-actions";
 import DeleteGroupButton from "@/components/DeleteGroupButton";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function GroupsPage() {
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
   const groups = await getGroups();
 
 
@@ -63,7 +71,7 @@ export default async function GroupsPage() {
                     </p>
 
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {group.members.map((member:string, index:number) => (
+                      {group.members.map((member: string, index: number) => (
                         <span
                           key={`${member}-${index}`}
                           className="rounded-full bg-purple-500/10 px-3 py-1 text-xs text-purple-300"

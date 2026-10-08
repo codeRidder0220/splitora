@@ -2,12 +2,25 @@
 
 import { connectDB } from "@/lib/mongodb";
 import Expense from "@/models/Expense";
+import { getCurrentUser } from "@/lib/auth";
 
 //get data from expense ->
 export async function getDashboardData() {
   await connectDB();
 
-  const expenses = await Expense.find()
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      totalExpense: 0,
+      thisMonth: 0,
+      categoryData: [],
+      monthlyData: [],
+    };
+  }
+
+
+  const expenses = await Expense.find({ userId: user.id,})
     .sort({ date: 1 })
     .lean();
 

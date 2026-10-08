@@ -4,11 +4,22 @@ import { connectDB } from "@/lib/mongodb";
 import Group from "@/models/Group";
 import type { GroupInput } from "@/types/group";
 import GroupExpense from "@/models/GroupExpense";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function createGroup(data: GroupInput) {
   await connectDB();
 
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in",
+    };
+  }
+
   const group = await Group.create({
+    userId: user.id,
     name: data.name,
     members: data.members,
   });
@@ -23,7 +34,13 @@ export async function createGroup(data: GroupInput) {
 export async function getGroups() {
   await connectDB();
 
-  const groups = await Group.find()
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const groups = await Group.find({userId: user.id})
     .sort({ createdAt: -1 })
     .lean();
 
@@ -38,7 +55,16 @@ export async function getGroups() {
 export async function getGroupById(id: string) {
   await connectDB();
 
-  const group = await Group.findById(id).lean();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const group = await Group.findOne({
+    _id: id,
+    userId: user.id,
+  }).lean();
 
   if (!group) {
     return null;
@@ -55,11 +81,19 @@ export async function getGroupById(id: string) {
 export async function deleteGroup(id: string) {
   await connectDB();
 
-  await GroupExpense.deleteMany({
-    groupId: id,
-  });
+  const user = await getCurrentUser();
 
-  const group = await Group.findByIdAndDelete(id);
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in",
+    };
+  }
+
+  const group = await Group.findOneAndDelete({
+    _id: id,
+    userId: user.id,
+  });
 
   if (!group) {
     return {
@@ -67,6 +101,10 @@ export async function deleteGroup(id: string) {
       message: "Group not found",
     };
   }
+
+  await GroupExpense.deleteMany({
+    groupId: id,
+  });
 
   return {
     success: true,

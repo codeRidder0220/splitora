@@ -1,5 +1,7 @@
 import EditExpenseForm from "@/components/EditExpenseForm";
 import { getExpenseById } from "@/app/actions/expense-action";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 interface ExpensePageProps {
   params: Promise<{
@@ -7,8 +9,14 @@ interface ExpensePageProps {
   }>;
 }
 
-export default async function ExpensePage({params,}: ExpensePageProps) {
-  
+export default async function ExpensePage({ params, }: ExpensePageProps) {
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const { expenseId } = await params;
 
   const expense = await getExpenseById(expenseId);

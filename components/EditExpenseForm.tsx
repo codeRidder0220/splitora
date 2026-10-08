@@ -15,8 +15,8 @@ interface EditExpenseFormProps {
   };
 }
 
-export default function EditExpenseForm({expense,}: EditExpenseFormProps) {
-  
+export default function EditExpenseForm({ expense, }: EditExpenseFormProps) {
+
   const router = useRouter();
 
   const [title, setTitle] = useState(expense.title);
@@ -26,11 +26,14 @@ export default function EditExpenseForm({expense,}: EditExpenseFormProps) {
     expense.date.slice(0, 10)
   );
   const [note, setNote] = useState(expense.note);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
+
+    setLoading(true);
 
     const result = await updateExpense(expense.id, {
       title,
@@ -39,6 +42,8 @@ export default function EditExpenseForm({expense,}: EditExpenseFormProps) {
       date,
       note: note || undefined,
     });
+
+    setLoading(false);
 
     if (result.success) {
       router.push("/expenses");
@@ -123,9 +128,10 @@ export default function EditExpenseForm({expense,}: EditExpenseFormProps) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400"
+        disabled={loading}
+        className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Update Expense
+        {loading ? "Updating..." : "Update Expense"}
       </button>
     </form>
   );

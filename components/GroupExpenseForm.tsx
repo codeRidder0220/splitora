@@ -9,9 +9,9 @@ interface GroupExpenseFormProps {
   members: string[];
 }
 
-export default function GroupExpenseForm({groupId,members,}: GroupExpenseFormProps) {
-  
-  
+export default function GroupExpenseForm({ groupId, members, }: GroupExpenseFormProps) {
+
+
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -19,10 +19,13 @@ export default function GroupExpenseForm({groupId,members,}: GroupExpenseFormPro
   const [paidBy, setPaidBy] = useState(members[0] ?? "");
   const [date, setDate] = useState("");
   const [note, setNote] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
-    
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+
     e.preventDefault();
+
+    setLoading(true);
 
     const result = await createGroupExpense({
       groupId,
@@ -32,6 +35,8 @@ export default function GroupExpenseForm({groupId,members,}: GroupExpenseFormPro
       date,
       note: note || undefined,
     });
+
+    setLoading(false);
 
     if (result.success) {
       setTitle("");
@@ -139,9 +144,10 @@ export default function GroupExpenseForm({groupId,members,}: GroupExpenseFormPro
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400"
+          disabled={loading}
+          className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Add Expense
+          {loading ? "Saving..." : "Add Expense"}
         </button>
       </form>
     </div>

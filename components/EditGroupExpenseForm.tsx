@@ -28,11 +28,14 @@ export default function EditGroupExpenseForm({
   const [paidBy, setPaidBy] = useState(expense.paidBy);
   const [date, setDate] = useState(expense.date.slice(0, 10));
   const [note, setNote] = useState(expense.note);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
+
+    setLoading(true);
 
     const result = await updateGroupExpense(expense.id, {
       groupId: expense.groupId,
@@ -42,6 +45,7 @@ export default function EditGroupExpenseForm({
       date,
       note: note || undefined,
     });
+    setLoading(false);
 
     if (result.success) {
       router.push(`/groups/${expense.groupId}`);
@@ -126,9 +130,10 @@ export default function EditGroupExpenseForm({
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400"
+        disabled={loading}
+        className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Update Expense
+        {loading ? "Updating..." : "Update Expense"}
       </button>
     </form>
   );

@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import { createExpense } from "@/app/actions/expense-action";
 
 export default function ExpenseForm() {
-    
+
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
     const [category, setCategory] = useState("Food");
     const [date, setDate] = useState("");
     const [note, setNote] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        setLoading(true);
 
         const result = await createExpense({
             title,
@@ -23,6 +26,8 @@ export default function ExpenseForm() {
             date,
             note: note || undefined,
         });
+
+        setLoading(false);
 
         if (result.success) {
             setTitle("");
@@ -124,9 +129,10 @@ export default function ExpenseForm() {
 
                 <button
                     type="submit"
-                    className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400"
+                    disabled={loading}
+                    className="w-full rounded-xl bg-purple-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    Add Expense
+                    {loading ? "Saving..." : "Add Expense"}
                 </button>
             </form>
         </div>

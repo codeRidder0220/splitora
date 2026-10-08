@@ -3,10 +3,32 @@
 import { connectDB } from "@/lib/mongodb";
 import GroupExpense from "@/models/GroupExpense";
 import type { GroupExpenseInput } from "@/types/group-expense";
+import { getCurrentUser } from "@/lib/auth";
+import Group from "@/models/Group";
 
-export async function createGroupExpense(data: GroupExpenseInput){
-  
+export async function createGroupExpense(data: GroupExpenseInput) {
   await connectDB();
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in",
+    };
+  }
+
+  const group = await Group.findOne({
+    _id: data.groupId,
+    userId: user.id,
+  });
+
+  if (!group) {
+    return {
+      success: false,
+      message: "Group not found",
+    };
+  }
 
   const expense = await GroupExpense.create({
     groupId: data.groupId,
@@ -26,6 +48,21 @@ export async function createGroupExpense(data: GroupExpenseInput){
 //get group expenses =>
 export async function getGroupExpenses(groupId: string) {
   await connectDB();
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const group = await Group.findOne({
+    _id: groupId,
+    userId: user.id,
+  });
+
+  if (!group) {
+    return [];
+  }
 
   const expenses = await GroupExpense.find({
     groupId,
@@ -51,8 +88,32 @@ export async function updateGroupExpense(
 ) {
   await connectDB();
 
-  const expense = await GroupExpense.findByIdAndUpdate(
-    id,
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in",
+    };
+  }
+
+  const group = await Group.findOne({
+    _id: data.groupId,
+    userId: user.id,
+  });
+
+  if (!group) {
+    return {
+      success: false,
+      message: "Group not found",
+    };
+  }
+
+  const expense = await GroupExpense.findOneAndUpdate(
+    {
+      _id: id,
+      groupId: data.groupId,
+    },
     {
       title: data.title,
       amount: data.amount,
@@ -60,9 +121,7 @@ export async function updateGroupExpense(
       date: data.date,
       note: data.note,
     },
-    {
-      new: true,
-    }
+    { new: true }
   );
 
   if (!expense) {
@@ -82,7 +141,16 @@ export async function updateGroupExpense(
 export async function deleteGroupExpense(id: string) {
   await connectDB();
 
-  const expense = await GroupExpense.findByIdAndDelete(id);
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in",
+    };
+  }
+
+  const expense = await GroupExpense.findById(id);
 
   if (!expense) {
     return {
@@ -91,17 +159,47 @@ export async function deleteGroupExpense(id: string) {
     };
   }
 
+  const group = await Group.findOne({
+    _id: expense.groupId,
+    userId: user.id,
+  });
+
+  if (!group) {
+    return {
+      success: false,
+      message: "Group not found",
+    };
+  }
+
+  await GroupExpense.findByIdAndDelete(id);
+
   return {
     success: true,
   };
 }
+
 //get group expense by id..
 export async function getGroupExpenseById(id: string) {
   await connectDB();
 
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
   const expense = await GroupExpense.findById(id).lean();
 
   if (!expense) {
+    return null;
+  }
+
+  const group = await Group.findOne({
+    _id: expense.groupId,
+    userId: user.id,
+  });
+
+  if (!group) {
     return null;
   }
 

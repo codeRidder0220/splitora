@@ -2,15 +2,25 @@ import PageHeader from "@/components/PageHeader";
 import { getDashboardData } from "@/app/actions/dashboard-actions";
 import MonthlyExpenseChart from "@/components/MonthlyExpenseCharts";
 import CategoryExpenseChart from "@/components/CategoryExpenseChart";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+  redirect("/login");
+}
+
   const dashboard = await getDashboardData();
 
   return (
     <main className="min-h-screen bg-[#0b1020] text-slate-100">
       <div className="mx-auto max-w-7xl px-6 py-12">
+        <p className="mb-4 text-purple-300">
+          Logged in as: {user ? user.name : "Not logged in"}
+        </p>
         <PageHeader
           title="Dashboard"
           description="Track your expenses and spending overview"

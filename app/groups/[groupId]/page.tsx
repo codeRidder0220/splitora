@@ -4,6 +4,8 @@ import { getGroupExpenses } from "@/app/actions/group-expense-actions";
 import DeleteGroupExpenseButton from "@/components/DeleteGroupExpenseButton";
 import { calculateSettlement } from "@/lib/calculationsettlement";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 
 interface GroupPageProps {
@@ -13,6 +15,12 @@ interface GroupPageProps {
 }
 
 export default async function GroupPage({ params, }: GroupPageProps) {
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   const { groupId } = await params;
 
@@ -82,7 +90,7 @@ export default async function GroupPage({ params, }: GroupPageProps) {
         </div>
 
         {/* summary--------------------------------------------------- */}
-        
+
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-slate-800 bg-[#121a2f] p-5">
             <p className="text-sm text-slate-400">
